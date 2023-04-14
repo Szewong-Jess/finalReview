@@ -14,12 +14,13 @@ import java.util.List;
 
 public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
     List<Dog> DogList;
-
+    onClickInterface onclick;
     public DogAdapter() {
     }
 
-    public DogAdapter(List<Dog> dogList) {
+    public DogAdapter(List<Dog> dogList, onClickInterface onclick) {
         DogList = dogList;
+        this.onclick =onclick;
     }
 
     @NonNull
@@ -29,6 +30,12 @@ public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
         LayoutDogitemBinding binding = LayoutDogitemBinding
                 .inflate(LayoutInflater.from(parent.getContext()),parent,false);
         DogViewHolder holder = new DogViewHolder(binding);
+        holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onclick.onClickEvent(holder.getAdapterPosition());
+            }
+        });
         return holder;
     }
 
@@ -43,7 +50,7 @@ public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
 
     @Override
     public int getItemCount() {
-        return 0;
+        return DogList.size();
     }
 
     public class DogViewHolder extends  RecyclerView.ViewHolder{
@@ -53,6 +60,10 @@ public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
             super(itemBinding.getRoot());
             binding = itemBinding;
         }
+    }
+
+    public interface onClickInterface{
+        void onClickEvent(int posistion);
     }
 
 }

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.finalreview.R;
 import com.example.finalreview.adapter.DogAdapter;
@@ -27,6 +28,8 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     DogDatabase ddb;
+
+    Toast toast;
 
 
     @Override
@@ -54,7 +57,15 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DogAdapter dogAdapter = new DogAdapter(AllDBDogs);
+                        DogAdapter dogAdapter = new DogAdapter(AllDBDogs, new DogAdapter.onClickInterface() {
+                            @Override
+                            public void onClickEvent(int posistion) {
+                                if(toast != null)
+                                    toast.cancel();
+                                toast = Toast.makeText(MainActivity.this, ""+AllDBDogs.get(posistion).getDogName(), Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        });
                         binding.recyclerViewDog.setAdapter(dogAdapter);
                     }
                 });
