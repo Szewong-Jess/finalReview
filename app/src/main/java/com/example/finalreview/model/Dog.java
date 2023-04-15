@@ -16,7 +16,7 @@ public class Dog {
     }
 
     @ColumnInfo(name="dogtypetgt")
-    private String DogTypeTgt;
+    private int DogTypeTgt;
 
     @ColumnInfo(name="dogtype")
     private String DogType;
@@ -27,7 +27,7 @@ public class Dog {
     @ColumnInfo(name="dogdob")
     private String DogDob;
 
-    public Dog(@NonNull String dogid, String dogTypeTgt, String dogType, String dogName, String dogDob) {
+    public Dog(@NonNull String dogid, int dogTypeTgt, String dogType, String dogName, String dogDob) {
         Dogid = dogid;
         DogTypeTgt = dogTypeTgt;
         DogType = dogType;
@@ -44,11 +44,11 @@ public class Dog {
         Dogid = dogid;
     }
 
-    public String getDogTypeTgt() {
+    public int getDogTypeTgt() {
         return DogTypeTgt;
     }
 
-    public void setDogTypeTgt(String dogTypeTgt) {
+    public void setDogTypeTgt(int dogTypeTgt) {
         DogTypeTgt = dogTypeTgt;
     }
 

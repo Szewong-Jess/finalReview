@@ -1,11 +1,17 @@
 package com.example.finalreview.activities;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.finalreview.R;
@@ -19,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -30,8 +38,11 @@ public class MainActivity extends AppCompatActivity {
     DogDatabase ddb;
 
     Toast toast;
+    int checkIdx = -1;
 
 
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         List<Dog> DogFromFile = ReadDogCSV();
+
         //DogAdapter dogAdater = new DogAdapter(DogFromFile);
         ddb = Room.databaseBuilder(getApplicationContext(),DogDatabase.class,"dog.db").build();
         DogDao dogDao = ddb.doogDao();
@@ -47,23 +59,45 @@ public class MainActivity extends AppCompatActivity {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         binding.recyclerViewDog.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
-        executorService.execute(new Runnable() {
 
+        executorService.execute(new Runnable() {
             @Override
             public void run() {
                 dogDao.insertDogs(DogFromFile);
                 List<Dog> AllDBDogs= dogDao.GetAllDogs();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                ImageView imageLarge = findViewById(R.id.imageViewLarge);
+                //Logic here doesnt work
+                if(checkIdx != -1){
+                    imageLarge.setImageResource(AllDBDogs.get(checkIdx).getDogTypeTgt());
+                }
+                checkIdx = sharedPreferences.getInt("IMGING",-1);
+
 
                 runOnUiThread(new Runnable() {
+
+
+
                     @Override
                     public void run() {
                         DogAdapter dogAdapter = new DogAdapter(AllDBDogs, new DogAdapter.onClickInterface() {
+
                             @Override
                             public void onClickEvent(int posistion) {
+                                checkIdx = posistion;
+
                                 if(toast != null)
                                     toast.cancel();
                                 toast = Toast.makeText(MainActivity.this, ""+AllDBDogs.get(posistion).getDogName(), Toast.LENGTH_SHORT);
                                 toast.show();
+
+                                if(checkIdx!=-1){
+                                    imageLarge.setImageResource(AllDBDogs.get(posistion).getDogTypeTgt());
+                                }else{
+                                    imageLarge.setImageResource(0);
+                                }
+
+
                             }
                         });
                         binding.recyclerViewDog.setAdapter(dogAdapter);
@@ -74,7 +108,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     //read csv data
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private List<Dog> ReadDogCSV(){
         List<Dog> DogList = new ArrayList<>();
         InputStream inputStream = getResources().openRawResource(R.raw.doginfo);
@@ -84,7 +122,15 @@ public class MainActivity extends AppCompatActivity {
             String dogLine;
             while((dogLine = reader.readLine()) != null) {
                 String[] eachDogField = dogLine.split(",");
-                Dog eachDog = new Dog(eachDogField[0],eachDogField[1],eachDogField[2],eachDogField[3],eachDogField[4]);
+                //Change the name to int for drawable use
+                int dogDrawable = getResources().getIdentifier(eachDogField[1],"drawable",getPackageName());
+                //Change the date format
+                //Change data format
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMM-yyyy");
+
+                LocalDate dob = LocalDate.parse(eachDogField[4],formatter);
+                String formattedDate = dob.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                Dog eachDog = new Dog(eachDogField[0],dogDrawable,eachDogField[2],eachDogField[3],formattedDate);
                 DogList.add(eachDog);
             }
         }catch (IOException ex){
@@ -97,9 +143,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
         return DogList;
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor =sharedPreferences.edit();
+        editor.putInt("IMGING",checkIdx);
+        editor.commit();
     }
 
 }
