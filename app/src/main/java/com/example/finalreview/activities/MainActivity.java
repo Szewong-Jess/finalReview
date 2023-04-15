@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,10 +37,8 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     DogDatabase ddb;
-
     Toast toast;
     int checkIdx = -1;
-
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -96,6 +95,18 @@ public class MainActivity extends AppCompatActivity {
                                 }else{
                                     imageLarge.setImageResource(0);
                                 }
+                                //to next activity
+                                Intent intent = new Intent(MainActivity.this,NextActivity.class);
+                                intent.putExtra("ID",AllDBDogs.get(posistion).getDogid());
+                                intent.putExtra("PICS",AllDBDogs.get(posistion).getDogTypeTgt());
+                                intent.putExtra("NAME",AllDBDogs.get(posistion).getDogName());
+                                intent.putExtra("TYPE",AllDBDogs.get(posistion).getDogType());
+                                intent.putExtra("DOB",AllDBDogs.get(posistion).getDogDob());
+                                startActivity(intent);
+
+
+
+
 
 
                             }
