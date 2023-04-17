@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         ddb = Room.databaseBuilder(getApplicationContext(),DogDatabase.class,"dog.db").build();
         DogDao dogDao = ddb.doogDao();
 
-
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         binding.recyclerViewDog.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
@@ -72,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 checkIdx = sharedPreferences.getInt("IMGING",-1);
 
+                if(checkIdx!=-1){
+                    imageLarge.setImageResource(AllDBDogs.get(checkIdx).getDogTypeTgt());
+                }else{
+                    imageLarge.setImageResource(0);
+                }
 
                 runOnUiThread(new Runnable() {
-
-
-
                     @Override
                     public void run() {
                         DogAdapter dogAdapter = new DogAdapter(AllDBDogs, new DogAdapter.onClickInterface() {
@@ -90,11 +91,8 @@ public class MainActivity extends AppCompatActivity {
                                 toast = Toast.makeText(MainActivity.this, ""+AllDBDogs.get(posistion).getDogName(), Toast.LENGTH_SHORT);
                                 toast.show();
 
-                                if(checkIdx!=-1){
-                                    imageLarge.setImageResource(AllDBDogs.get(posistion).getDogTypeTgt());
-                                }else{
-                                    imageLarge.setImageResource(0);
-                                }
+                                imageLarge.setImageResource(AllDBDogs.get(posistion).getDogTypeTgt());
+
                                 //to next activity
                                 Intent intent = new Intent(MainActivity.this,NextActivity.class);
                                 intent.putExtra("ID",AllDBDogs.get(posistion).getDogid());
@@ -103,23 +101,12 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("TYPE",AllDBDogs.get(posistion).getDogType());
                                 intent.putExtra("DOB",AllDBDogs.get(posistion).getDogDob());
                                 startActivity(intent);
-
-
-
-
-
-
                             }
                         });
                         binding.recyclerViewDog.setAdapter(dogAdapter);
                     }
                 });
-            }
-        });
-    }
-
-
-
+            }});}
 
     //read csv data
 
@@ -153,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                 ex.printStackTrace();
             }
         }
-
         return DogList;
     }
 
