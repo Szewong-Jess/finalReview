@@ -22,12 +22,12 @@ public class Dog {
     private String DogType;
 
     @ColumnInfo(name="dogname")
-    private String DogName;
+    private int DogName;
 
     @ColumnInfo(name="dogdob")
     private String DogDob;
 
-    public Dog(@NonNull String dogid, int dogTypeTgt, String dogType, String dogName, String dogDob) {
+    public Dog(@NonNull String dogid, int dogTypeTgt, String dogType, int dogName, String dogDob) {
         Dogid = dogid;
         DogTypeTgt = dogTypeTgt;
         DogType = dogType;
@@ -60,11 +60,11 @@ public class Dog {
         DogType = dogType;
     }
 
-    public String getDogName() {
+    public int getDogName() {
         return DogName;
     }
 
-    public void setDogName(String dogName) {
+    public void setDogName(int dogName) {
         DogName = dogName;
     }
 

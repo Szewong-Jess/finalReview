@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.RoomDatabase;
 
 import com.example.finalreview.databinding.LayoutDogitemBinding;
 import com.example.finalreview.model.Dog;
@@ -19,6 +20,8 @@ import java.util.List;
 public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
     List<Dog> DogList;
     onClickInterface onclick;
+
+
     public DogAdapter() {
     }
 
@@ -38,6 +41,7 @@ public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
             @Override
             public void onClick(View v) {
                 onclick.onClickEvent(holder.getAdapterPosition());
+                notifyDataSetChanged();
             }
         });
         return holder;
@@ -48,9 +52,10 @@ public class DogAdapter extends RecyclerView.Adapter<DogAdapter.DogViewHolder> {
     public void onBindViewHolder(@NonNull DogViewHolder holder, int position) {
         holder.binding.txtViewId.setText(String.valueOf(DogList.get(position).getDogid()));
         holder.binding.txtViewBreed.setText(DogList.get(position).getDogType());
-        holder.binding.txtViewName.setText(DogList.get(position).getDogName());
+        holder.binding.txtViewName.setText(String.valueOf(DogList.get(position).getDogName()));
         holder.binding.imgViewDogPic.setImageResource(DogList.get(position).getDogTypeTgt());
         holder.binding.txtViewDOB.setText(DogList.get(position).getDogDob());
+
     }
 
     @Override

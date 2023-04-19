@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     Toast toast;
     int checkIdx = -1;
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,31 +65,40 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                 ImageView imageLarge = findViewById(R.id.imageViewLarge);
                 //Logic here doesnt work
-                if(checkIdx != -1){
-                    imageLarge.setImageResource(AllDBDogs.get(checkIdx).getDogTypeTgt());
-                }
+
                 checkIdx = sharedPreferences.getInt("IMGING",-1);
 
-                if(checkIdx!=-1){
+              /*  if(checkIdx!=-1){
                     imageLarge.setImageResource(AllDBDogs.get(checkIdx).getDogTypeTgt());
                 }else{
                     imageLarge.setImageResource(0);
-                }
+                } */
 
-                runOnUiThread(new Runnable() {
+                DogAdapter dogAdapter = new DogAdapter(AllDBDogs, new DogAdapter.onClickInterface() {
                     @Override
-                    public void run() {
-                        DogAdapter dogAdapter = new DogAdapter(AllDBDogs, new DogAdapter.onClickInterface() {
+                    public void onClickEvent(int posistion) {
+                        checkIdx = posistion;
+                        toast = Toast.makeText(MainActivity.this, ""+AllDBDogs.get(posistion).getDogName(), Toast.LENGTH_SHORT);
+                        toast.show();
 
+                        int num = AllDBDogs.get(posistion).getDogName();
+                        num++;
+                        AllDBDogs.get(posistion).setDogName(num);
+
+                        // Update the dog name on a separate thread using Kotlin's Coroutines
+                        Executors.newSingleThreadExecutor().execute(new Runnable() {
                             @Override
-                            public void onClickEvent(int posistion) {
-                                checkIdx = posistion;
+                            public void run() {
+                                ddb.doogDao().UpdateDogName(String.valueOf(posistion+1));
+                            }
+                        });
 
+                        // Notify the adapter that data has changed
+                        // Notify the adapter that data has changed
+
+                                /*
                                 if(toast != null)
                                     toast.cancel();
-                                toast = Toast.makeText(MainActivity.this, ""+AllDBDogs.get(posistion).getDogName(), Toast.LENGTH_SHORT);
-                                toast.show();
-
                                 imageLarge.setImageResource(AllDBDogs.get(posistion).getDogTypeTgt());
 
                                 //to next activity
@@ -101,8 +109,16 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("TYPE",AllDBDogs.get(posistion).getDogType());
                                 intent.putExtra("DOB",AllDBDogs.get(posistion).getDogDob());
                                 startActivity(intent);
-                            }
-                        });
+                                */
+                    }
+                });
+
+
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
                         binding.recyclerViewDog.setAdapter(dogAdapter);
                     }
                 });
@@ -128,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
                 LocalDate dob = LocalDate.parse(eachDogField[4],formatter);
                 String formattedDate = dob.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-                Dog eachDog = new Dog(eachDogField[0],dogDrawable,eachDogField[2],eachDogField[3],formattedDate);
+                Dog eachDog = new Dog(eachDogField[0],dogDrawable,eachDogField[2],Integer.parseInt(eachDogField[3]),formattedDate);
                 DogList.add(eachDog);
             }
         }catch (IOException ex){
